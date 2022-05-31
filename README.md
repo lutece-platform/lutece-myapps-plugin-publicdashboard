@@ -1,0 +1,1 @@
+# lutece-myapps-plugin-publicdashboard
