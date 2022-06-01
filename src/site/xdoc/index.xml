@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <properties>
+        <title>Plugin componentdashboard</title>
+    </properties>
+    <head>
+        <!-- Keywords example : "cms, authentication, cms, workflow, seo, collaborative, ..." 
+             Use the language of this xdoc -->
+        <meta name="keywords" content="" />
+    </head>
+    <body>
+        <section name="Plugin componentdashboard">
+            <!--
+            <p>
+                <img src="images/componentdashboard.png" />
+            </p>
+            -->
+            <subsection name="Introduction">
+                <p>
+                This plugin is used to add, remove and manage publicdashboard.
+                </p>
+            </subsection>
+            <subsection name="Configuration">
+                <p>
+                In Back-Office, you can access the page Dashboard Gestion to add or remove publicdashboard.
+                You can also change the order in which they appear.
+                In the publicdashboard.properties, the property publicdashboard.encrypt indicates if the user_id
+                must be decrypted or not. The property is at false by default.
+                For a publicdashboard to be add, the class must implement the IPublicDashboardComponent and be
+                injected into the _context.xml file.
+                </p>
+            </subsection>
+            <subsection name="Usage">
+                <p>
+                In front office, you can access the publicdashboard by the url 
+                Portal.jsp?page=dashboard&amp;view=getDashboards&amp;id_user=
+                The id_user must be encrypted if the property publicdashboard.encrypt is at true
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>
+
