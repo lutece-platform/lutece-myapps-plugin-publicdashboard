@@ -7,15 +7,15 @@
 
 ## Introduction
 
-This plugin is used to add, remove and manage publicdashboard.
+Ce plugin est utilisé pour ajouter, enlever et consulter des publicdashboard
 
 ## Configuration
 
-In Back-Office, you can access the page Dashboard Gestion to add or remove publicdashboard. You can also change the order in which they appear.In the publicdashboard.properties, the property publicdashboard.encrypt indicates if the user_id must be decrypted or not. The property is at false by default.For a publicdashboard to be add, the class must implement the IPublicDashboardComponent and be injected into the _context.xml file.
+En Back-Office, vous pouvez accéder via la page Gestion des dashboard pour ajouter ou enlever des publicdashboard. Vous pouvez également modifier leur ordre d'apparition.Dans le fichier publicdashboard.properties, la propriété publicdashboard.encrypt indique si le user_id passé en paramètre est à décrypter ou non. Par défaut, il est à faux.Pour qu'un publicdashboard puisse être ajouter, sa classe doit implémenter l'interface IPublicDashboardComponent et être injecté dans le fichier _context.xml
 
 ## Usage
 
-In front office, you can access the publicdashboard by the url Portal.jsp?page=dashboard&view=getDashboards&id_user= The id_user must be encrypted if the property publicdashboard.encrypt is at true
+En front office, vous pouvez accéder aux publicdashboards via l'url Portal.jsp?page=dashboard&view=getDashboards&id_user= Le paramètre id_user doit être chiffrer si la propriété publicdashboard.encrypt est à vrai
 
 
 [Maven documentation and reports](https://dev.lutece.paris.fr/plugins/plugin-publicdashboard/)
