@@ -34,11 +34,19 @@
 package fr.paris.lutece.plugins.publicdashboard.service;
 
 import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
+
+import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboard;
+import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboardHome;
 import fr.paris.lutece.portal.service.content.XPageAppService;
+import fr.paris.lutece.portal.service.dashboard.IPublicDashboardComponent;
 import fr.paris.lutece.portal.service.security.RsaService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -53,55 +61,99 @@ public class PublicDashboardService
     public static final String PROPERTY_ENCRYPT = "publicdashboard.encrypt";
 
     public static final String PAGE_NAME = "dashboard";
-    public static final String PARAMETER_USER_ID = "id_user";
+
+    // Parameters
+    public static final String PARAMETER_ID = "id";
 
     /**
-     * Decrypt guid.
+     * Decrypt id.
      *
-     * @param guid
-     *            the guid
+     * @param id
+     *            the id
      * @return the string
      */
-    public static String decryptGuid( String guid )
+    public static String decryptId( String id )
     {
         if ( AppPropertiesService.getPropertyBoolean( PublicDashboardService.PROPERTY_ENCRYPT, false ) )
         {
             try
             {
-                return RsaService.decryptRsa( guid );
+                return RsaService.decryptRsa( id );
             }
             catch( GeneralSecurityException e )
             {
-                AppLogService.error( "Cannot decrypt " + guid, e );
+                AppLogService.error( "Cannot decrypt " + id, e );
             }
         }
 
-        return guid;
+        return id;
     }
 
     /**
      * Gets the url.
      *
-     * @param userid
-     *            the userid
+     * @param id
+     *            the id
      * @return the url
      * @throws GeneralSecurityException
      *             the general security exception
      */
-    public static String getUrl( String userid, HttpServletRequest request ) throws GeneralSecurityException
+    public static String getUrl( String id, HttpServletRequest request ) throws GeneralSecurityException
     {
         UrlItem url = new UrlItem( AppPathService.getBaseUrl( request ) + AppPathService.getPortalUrl( ) );
         url.addParameter( XPageAppService.PARAM_XPAGE_APP, PAGE_NAME );
         if ( AppPropertiesService.getPropertyBoolean( PROPERTY_ENCRYPT, false ) )
         {
-            url.addParameter( PARAMETER_USER_ID, RsaService.encryptRsa( userid ) );
+            url.addParameter( PARAMETER_ID, RsaService.encryptRsa( id ) );
         }
         else
         {
-            url.addParameter( PARAMETER_USER_ID, userid );
+            url.addParameter( PARAMETER_ID, id );
         }
 
         return url.getUrl( );
+    }
+
+    /**
+     * Fill the template and model
+     * @param lstDashboard list of all dashboard
+     * @param mapDashboardModel the model
+     * @param mapIncludeTemplateDashboard the template
+     * @param request the request
+     */
+    public static void supplyModelAndTemplate( List<PublicDashboard> lstDashboard, Map<String, Object> mapDashboardModel,
+            Map<String, String> mapIncludeTemplateDashboard, HttpServletRequest request )
+    {
+        for ( PublicDashboard dash : lstDashboard )
+        {
+            IPublicDashboardComponent dashboard = SpringContextService.getBean( dash.getIdBean( ) );
+            if ( dashboard != null )
+            {
+                mapDashboardModel.putAll( dashboard.getDashboardModel(
+                        PublicDashboardService.decryptId( request.getParameter( PublicDashboardService.PARAMETER_ID ) ), request.getParameterMap( ) ) );
+
+                mapIncludeTemplateDashboard.put( dashboard.getComponentId( ), dashboard.getDashboardTemplate( ) );
+            }
+        }
+
+    }
+    
+    /**
+     * get the last position within a zone for a dashboard
+     * @param dashboard the dashboard
+     * @return
+     */
+    public static int getLastPosition(PublicDashboard dashboard)
+    {
+    	int nOrder = 1;
+        List<PublicDashboard> listDashboard = PublicDashboardHome.getDashboardsListFromZone( dashboard.getZone( ) );
+
+        if ( !CollectionUtils.isEmpty( listDashboard ) )
+        {
+            nOrder = listDashboard.get( listDashboard.size( ) - 1 ).getPosition( ) + 1;
+        }
+
+        return nOrder;
     }
 
 }

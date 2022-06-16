@@ -7,24 +7,24 @@
     <installation></installation>
     <changes></changes>
     <user-guide></user-guide>
-    <description>componentdashboard.plugin.description</description>
-    <provider>componentdashboard.plugin.provider</provider>
+    <description>publicdashboard.plugin.description</description>
+    <provider>publicdashboard.plugin.provider</provider>
     <provider-url>http://www.paris.fr</provider-url>
     <icon-url>images/admin/skin/feature_default_icon.png</icon-url>
-    <copyright>componentDashboard</copyright>
+    <copyright>publicDashboard</copyright>
     <db-pool-required>1</db-pool-required>
     
     <core-version-dependency>
-        <min-core-version>4.1.0</min-core-version>
+        <min-core-version>7.0.6-SNAPSHOT</min-core-version>
         <max-core-version/>
     </core-version-dependency>
 
     <!-- Admin features parameters -->
     <admin-features>
         <admin-feature>
-            <feature-id>COMPONENTDASHBOARD_MANAGEMENT</feature-id>
-            <feature-title>componentdashboard.adminFeature.ManageDashboard.name</feature-title>
-            <feature-description>componentdashboard.adminFeature.ManageDashboard.description</feature-description>
+            <feature-id>PUBLICDASHBOARD_MANAGEMENT</feature-id>
+            <feature-title>publicdashboard.adminFeature.ManageDashboard.name</feature-title>
+            <feature-description>publicdashboard.adminFeature.ManageDashboard.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/publicdashboard/ManageDashboards.jsp</feature-url>
             <feature-icon-url></feature-icon-url>
@@ -34,7 +34,7 @@
     <!-- XPages parameters -->
     <applications>
         <application>
-            <application-id>dashboard</application-id>
+            <application-id>publicdashboard</application-id>
             <application-class>fr.paris.lutece.plugins.publicdashboard.web.PublicDashboardXPage</application-class>
         </application>
     </applications>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
     <properties>
-        <title>Plugin componentdashboard</title>
+        <title>Plugin publicdashboard</title>
     </properties>
     <head>
         <!-- Keywords example : "cms, authentication, cms, workflow, seo, collaborative, ..." 
              Use the language of this xdoc -->
-        <meta name="keywords" content="" />
+        <meta name="keywords" content="dashboard, profile" />
     </head>
     <body>
-        <section name="Plugin componentdashboard">
+        <section name="Plugin publicdashboard">
             <!--
             <p>
                 <img src="images/componentdashboard.png" />
@@ -17,7 +17,8 @@
             -->
             <subsection name="Introduction">
                 <p>
-                This plugin is used to add, remove and manage publicdashboard.
+                This plugin is used to add, remove and manage publicdashboard. A publicdashboard is a user 
+                dashboard that can be viewed publicly by any user.
                 </p>
             </subsection>
             <subsection name="Configuration">
@@ -33,8 +34,10 @@
             <subsection name="Usage">
                 <p>
                 In front office, you can access the publicdashboard by the url 
-                Portal.jsp?page=dashboard&amp;view=getDashboards&amp;id_user=
+                Portal.jsp?page=publicdashboard&amp;view=getDashboards&amp;id=
                 The id_user must be encrypted if the property publicdashboard.encrypt is at true
+                To encrypt the id_user, you must use the method encryptRsa in the RsaService class
+                from the lutece core.
                 </p>
             </subsection>
         </section>

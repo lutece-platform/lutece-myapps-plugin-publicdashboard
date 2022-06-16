@@ -126,11 +126,27 @@ public interface IPublicDashboardDAO
      */
     List<PublicDashboard> selectDashboardsListByIds( Plugin _plugin, List<Integer> listIds );
 
+    /**
+     * Load the data of order by position and returns them as a list
+     * 
+     * @param plugin
+     *            the Plugin
+     * @return The list which contains the data of ordered by position
+     */
     List<PublicDashboard> selectDashboardsListByPosition( Plugin _plugin );
 
     /**
-     * {@inheritDoc }
+     * 
+     * @param _plugin
+     * @return all id order py position
      */
-
     List<Integer> selectIdDashboardsListByPosition( Plugin _plugin );
+
+    /**
+     * 
+     * @param plugin
+     * @param zone
+     * @return all dashboar from a specific zone
+     */
+    List<PublicDashboard> selectDashboardsListByZone( Plugin plugin, int zone );
 }

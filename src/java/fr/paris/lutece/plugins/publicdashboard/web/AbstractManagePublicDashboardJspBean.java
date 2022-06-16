@@ -50,7 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class AbstractManagePublicDashboardJspBean<S, T> extends MVCAdminJspBean
 {
     // Rights
-    public static final String RIGHT_MANAGEDASHBOARD = "COMPONENTDASHBOARD_MANAGEMENT";
+    public static final String RIGHT_MANAGEDASHBOARD = "PUBLICDASHBOARD_MANAGEMENT";
 
     // Properties
     private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "componentdashboard.listItems.itemsPerPage";
@@ -95,23 +95,8 @@ public abstract class AbstractManagePublicDashboardJspBean<S, T> extends MVCAdmi
 
         model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         model.put( MARK_PAGINATOR, paginator );
-        model.put( strBookmark, getItemsFromIds( paginator.getPageItems( ) ) );
+        model.put( strBookmark, paginator.getPageItems( ) );
 
         return model;
     }
-
-    /**
-     * Get Items from Ids list
-     * 
-     * @param <T>
-     *
-     * @param <S>
-     *            the generic type of the Ids
-     * @param <T>
-     *            the generic type of the items
-     * @param <S>
-     * @param listIds
-     * @return the populated list of items corresponding to the id List
-     */
-    abstract List<T> getItemsFromIds( List<S> listIds );
 }

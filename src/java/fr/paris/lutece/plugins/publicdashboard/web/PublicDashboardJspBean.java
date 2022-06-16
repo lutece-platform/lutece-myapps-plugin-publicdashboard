@@ -40,6 +40,7 @@ import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboard;
 import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboardHome;
+import fr.paris.lutece.plugins.publicdashboard.service.PublicDashboardService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.dashboard.IPublicDashboardComponent;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -53,6 +54,7 @@ import fr.paris.lutece.util.html.AbstractPaginator;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +64,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * This class provides the user interface to manage Dashboard features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageDashboards.jsp", controllerPath = "jsp/admin/plugins/publicdashboard/", right = "COMPONENTDASHBOARD_MANAGEMENT" )
+@Controller( controllerJsp = "ManageDashboards.jsp", controllerPath = "jsp/admin/plugins/publicdashboard/", right = "PUBLICDASHBOARD_MANAGEMENT" )
 public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean<Integer, PublicDashboard>
 {
     // Templates
@@ -79,9 +81,9 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
     private static final String PROPERTY_PAGE_TITLE_CREATE_DASHBOARD = "componentdashboard.create_dashboard.pageTitle";
 
     // Markers
-    private static final String MARK_DASHBOARD_LIST = "dashboard_list";
     private static final String MARK_DASHBOARD = "dashboard";
-    private static final String MARK_LIST_DASHBOARD = "listtypedashboard";
+    private static final String MARK_MAP_DESCRIPTION_DASHBOARD = "listtypedashboard";
+    private static final String MARK_ZONE_MAP_DASHBOARD = "mapZoneDashboard";
 
     private static final String JSP_MANAGE_DASHBOARDS = "jsp/admin/plugins/publicdashboard/ManageDashboards.jsp";
 
@@ -105,14 +107,18 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
     private static final String ACTION_MOVE_DOWN_DASHBOARD = "moveDownDashboard";
 
     // Infos
-    private static final String INFO_DASHBOARD_CREATED = "componentdashboard.info.dashboard.created";
-    private static final String INFO_DASHBOARD_UPDATED = "componentdashboard.info.dashboard.updated";
-    private static final String INFO_DASHBOARD_REMOVED = "componentdashboard.info.dashboard.removed";
+    private static final String INFO_DASHBOARD_CREATED = "publicdashboard.info.dashboard.created";
+    private static final String INFO_DASHBOARD_UPDATED = "publicdashboard.info.dashboard.updated";
+    private static final String INFO_DASHBOARD_REMOVED = "publicdashboard.info.dashboard.removed";
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
 
     private static final String PARAMETER_ID = "id";
+    private static final String PARAMETER_ZONE = "zone";
+
+    private static final String CONSTANT_MOVE_UP = "up";
+    private static final String CONSTANT_MOVE_DOWN = "down";
 
     // Session variable to store working values
     private PublicDashboard _dashboard;
@@ -130,47 +136,25 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
     {
         _dashboard = null;
 
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdDashboards.isEmpty( ) )
-        {
-            _listIdDashboards = PublicDashboardHome.getIdDashboardsListByPosition( );
-        }
-
-        Map<String, Object> model = getPaginatedListModel( request, MARK_DASHBOARD_LIST, _listIdDashboards, JSP_MANAGE_DASHBOARDS );
+        Map<String, Object> model = getModel( );
 
         List<IPublicDashboardComponent> lstDashboard = SpringContextService.getBeansOfType( IPublicDashboardComponent.class );
-        Map<String, String> mapDashboard = new HashMap<String, String>( );
+        Map<String, String> mapDescriptionDashboard = new HashMap<String, String>( );
 
         for ( IPublicDashboardComponent dash : lstDashboard )
         {
-            mapDashboard.put( dash.getComponentId( ), dash.getComponentDescription( ) );
+            mapDescriptionDashboard.put( dash.getComponentId( ), dash.getComponentDescription( getLocale( ) ) );
         }
 
-        model.put( MARK_LIST_DASHBOARD, mapDashboard );
+        List<PublicDashboard> lstPublicDashboard = PublicDashboardHome.getDashboardsList( );
+        Collections.sort( lstPublicDashboard );
+
+        Map<String, List<PublicDashboard>> mapZoneDashboard = PublicDashboardHome.getMapZoneDashboard( lstPublicDashboard );
+
+        model.put( MARK_MAP_DESCRIPTION_DASHBOARD, mapDescriptionDashboard );
+        model.put( MARK_ZONE_MAP_DASHBOARD, mapZoneDashboard );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_DASHBOARDS, TEMPLATE_MANAGE_DASHBOARDS, model );
-    }
-
-    /**
-     * Get Items from Ids list
-     * 
-     * @param listIds
-     * @return the populated list of items corresponding to the id List
-     */
-    @Override
-    List<PublicDashboard> getItemsFromIds( List<Integer> listIds )
-    {
-        List<PublicDashboard> listDashboard = PublicDashboardHome.getDashboardsListByIds( listIds );
-
-        // keep original order
-        return listDashboard.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
-    }
-
-    /**
-     * reset the _listIdDashboards list
-     */
-    public void resetListId( )
-    {
-        _listIdDashboards = new ArrayList<>( );
     }
 
     /**
@@ -192,11 +176,13 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
 
         for ( IPublicDashboardComponent dash : lstDashboard )
         {
-            reflstDashboard.addItem( dash.getComponentId( ), dash.getComponentDescription( ) );
+            reflstDashboard.addItem( dash.getComponentId( ), dash.getComponentDescription( getLocale( ) ) );
         }
 
+        _dashboard.setZone( Integer.valueOf( request.getParameter( PARAMETER_ZONE ) ) );
+
         model.put( MARK_DASHBOARD, _dashboard );
-        model.put( MARK_LIST_DASHBOARD, reflstDashboard );
+        model.put( MARK_MAP_DESCRIPTION_DASHBOARD, reflstDashboard );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_DASHBOARD ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_DASHBOARD, TEMPLATE_CREATE_DASHBOARD, model );
@@ -212,32 +198,7 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
     @Action( ACTION_MOVE_UP_DASHBOARD )
     public String doMoveUpComponent( HttpServletRequest request )
     {
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID ) );
-
-        Optional<PublicDashboard> opt_public_dashboard = PublicDashboardHome.findByPrimaryKey( nId );
-
-        if ( opt_public_dashboard.isPresent( ) )
-        {
-            PublicDashboard publicDashboardSelected = opt_public_dashboard.get( );
-            List<PublicDashboard> listDashboard = PublicDashboardHome.getDashboardsListByPosition( );
-
-            int nbPosition = 0;
-
-            for ( PublicDashboard dashboard : listDashboard )
-            {
-                if ( ( dashboard.getId( ) == publicDashboardSelected.getId( ) ) && ( nbPosition != 0 ) )
-                {
-                    PublicDashboard dashboardPrev = listDashboard.get( nbPosition - 1 );
-                    int nNewPosition = dashboardPrev.getPosition( );
-                    dashboardPrev.setPosition( publicDashboardSelected.getPosition( ) );
-                    publicDashboardSelected.setPosition( nNewPosition );
-                    PublicDashboardHome.update( dashboardPrev );
-                    PublicDashboardHome.update( publicDashboardSelected );
-                }
-
-                nbPosition++;
-            }
-        }
+        doMoveDashboard( request, CONSTANT_MOVE_UP );
 
         return redirectView( request, VIEW_MANAGE_DASHBOARDS );
     }
@@ -252,6 +213,13 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
     @Action( ACTION_MOVE_DOWN_DASHBOARD )
     public String doMoveDownComponent( HttpServletRequest request )
     {
+        doMoveDashboard( request, CONSTANT_MOVE_DOWN );
+
+        return redirectView( request, VIEW_MANAGE_DASHBOARDS );
+    }
+
+    private void doMoveDashboard( HttpServletRequest request, String movement )
+    {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID ) );
 
         Optional<PublicDashboard> opt_public_dashboard = PublicDashboardHome.findByPrimaryKey( nId );
@@ -259,26 +227,40 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
         if ( opt_public_dashboard.isPresent( ) )
         {
             PublicDashboard publicDashboardSelected = opt_public_dashboard.get( );
-            List<PublicDashboard> listDashboard = PublicDashboardHome.getDashboardsListByPosition( );
+            List<PublicDashboard> listDashboard = PublicDashboardHome.getDashboardsListFromZone( Integer.valueOf( request.getParameter( PARAMETER_ZONE ) ) );
+
             int nbPosition = 0;
 
             for ( PublicDashboard dashboard : listDashboard )
             {
-                if ( ( dashboard.getId( ) == publicDashboardSelected.getId( ) ) && ( nbPosition != ( listDashboard.size( ) - 1 ) ) )
+                if ( movement.equals( CONSTANT_MOVE_UP ) )
                 {
-                    PublicDashboard dashboardNext = listDashboard.get( nbPosition + 1 );
-                    int nNewPosition = dashboardNext.getPosition( );
-                    dashboardNext.setPosition( publicDashboardSelected.getPosition( ) );
-                    publicDashboardSelected.setPosition( nNewPosition );
-                    PublicDashboardHome.update( dashboardNext );
-                    PublicDashboardHome.update( publicDashboardSelected );
+                    if ( ( dashboard.getId( ) == publicDashboardSelected.getId( ) ) && ( nbPosition != 0 ) )
+                    {
+                        PublicDashboard dashboardNewPosition = listDashboard.get( nbPosition - 1 );
+                        int nNewPosition = dashboardNewPosition.getPosition( );
+                        dashboardNewPosition.setPosition( publicDashboardSelected.getPosition( ) );
+                        publicDashboardSelected.setPosition( nNewPosition );
+                        PublicDashboardHome.update( dashboardNewPosition );
+                        PublicDashboardHome.update( publicDashboardSelected );
+                    }
                 }
-
+                else
+                    if ( movement.equals( CONSTANT_MOVE_DOWN ) )
+                    {
+                        if ( ( dashboard.getId( ) == publicDashboardSelected.getId( ) ) && ( nbPosition != ( listDashboard.size( ) - 1 ) ) )
+                        {
+                            PublicDashboard dashboardNewPosition = listDashboard.get( nbPosition + 1 );
+                            int nNewPosition = dashboardNewPosition.getPosition( );
+                            dashboardNewPosition.setPosition( publicDashboardSelected.getPosition( ) );
+                            publicDashboardSelected.setPosition( nNewPosition );
+                            PublicDashboardHome.update( dashboardNewPosition );
+                            PublicDashboardHome.update( publicDashboardSelected );
+                        }
+                    }
                 nbPosition++;
             }
         }
-
-        return redirectView( request, VIEW_MANAGE_DASHBOARDS );
     }
 
     /**
@@ -304,10 +286,10 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
         {
             return redirectView( request, VIEW_CREATE_DASHBOARD );
         }
-
+        
+        _dashboard.setPosition( PublicDashboardService.getLastPosition(_dashboard) );
         PublicDashboardHome.create( _dashboard );
         addInfo( INFO_DASHBOARD_CREATED, getLocale( ) );
-        resetListId( );
 
         return redirectView( request, VIEW_MANAGE_DASHBOARDS );
     }
@@ -345,7 +327,6 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
 
         PublicDashboardHome.remove( nId );
         addInfo( INFO_DASHBOARD_REMOVED, getLocale( ) );
-        resetListId( );
 
         return redirectView( request, VIEW_MANAGE_DASHBOARDS );
     }
@@ -375,11 +356,11 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
 
         for ( IPublicDashboardComponent dash : lstDashboard )
         {
-            reflstDashboard.addItem( dash.getComponentId( ), dash.getComponentDescription( ) );
+            reflstDashboard.addItem( dash.getComponentId( ), dash.getComponentDescription( getLocale( ) ) );
         }
 
         model.put( MARK_DASHBOARD, _dashboard );
-        model.put( MARK_LIST_DASHBOARD, reflstDashboard );
+        model.put( MARK_MAP_DESCRIPTION_DASHBOARD, reflstDashboard );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_DASHBOARD ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_DASHBOARD, TEMPLATE_MODIFY_DASHBOARD, model );
@@ -411,7 +392,6 @@ public class PublicDashboardJspBean extends AbstractManagePublicDashboardJspBean
 
         PublicDashboardHome.update( _dashboard );
         addInfo( INFO_DASHBOARD_UPDATED, getLocale( ) );
-        resetListId( );
 
         return redirectView( request, VIEW_MANAGE_DASHBOARDS );
     }
