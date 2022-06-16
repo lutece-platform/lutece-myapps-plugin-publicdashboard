@@ -1,9 +1,18 @@
-<div class="row-fluid">
+<div class="container">
 	<fieldset>
-		<#list dashboard_list_content as dashboard>
-			<div class="well">
-				${dashboard!}
+		<#assign zone=0 />
+		<div class="row">
+		<#list list_dashboard as dashboard>
+			<#if zone != dashboard.zone >
+				<#assign zone = dashboard.zone />
+				</div>
+				<div class="row">
+			</#if>
+
+			<div class="col">
+				<#include map_template_dashboard[dashboard.idBean]>
 			</div>
 		</#list>
+		</div>
 	</fieldset>
 </div>

@@ -50,13 +50,14 @@ public final class PublicDashboardDAO implements IPublicDashboardDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard WHERE id_dashboard = ?";
+    private static final String SQL_QUERY_SELECT_BY_ZONE = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard WHERE zone = ? ORDER BY position";
     private static final String SQL_QUERY_INSERT = "INSERT INTO publicdashboard_dashboard ( id_bean, zone, position ) VALUES ( ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM publicdashboard_dashboard WHERE id_dashboard = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE publicdashboard_dashboard SET id_dashboard = ?, id_bean = ?, zone = ?, position = ? WHERE id_dashboard = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard";
-    private static final String SQL_QUERY_SELECTALL_BY_POSITION = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard ORDER BY position";
+    private static final String SQL_QUERY_SELECTALL_ORDER_BY_POSITION = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard ORDER BY position";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_dashboard FROM publicdashboard_dashboard";
-    private static final String SQL_QUERY_SELECTALL_ID_BY_POSITION = "SELECT id_dashboard FROM publicdashboard_dashboard ORDER BY position";
+    private static final String SQL_QUERY_SELECTALL_ID_ORDER_BY_POSITION = "SELECT id_dashboard FROM publicdashboard_dashboard ORDER BY position";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_dashboard, id_bean, zone, position FROM publicdashboard_dashboard WHERE id_dashboard IN (  ";
 
     /**
@@ -266,7 +267,7 @@ public final class PublicDashboardDAO implements IPublicDashboardDAO
     public List<PublicDashboard> selectDashboardsListByPosition( Plugin plugin )
     {
         List<PublicDashboard> publicDashboardList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_BY_POSITION, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ORDER_BY_POSITION, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -292,7 +293,7 @@ public final class PublicDashboardDAO implements IPublicDashboardDAO
     public List<Integer> selectIdDashboardsListByPosition( Plugin plugin )
     {
         List<Integer> dashboardList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID_BY_POSITION, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID_ORDER_BY_POSITION, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -304,4 +305,34 @@ public final class PublicDashboardDAO implements IPublicDashboardDAO
             return dashboardList;
         }
     }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<PublicDashboard> selectDashboardsListByZone( Plugin plugin, int zone )
+    {
+        List<PublicDashboard> dashboardList = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ZONE, plugin ) )
+        {
+            daoUtil.setInt( 1, zone );
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                PublicDashboard dashboard = new PublicDashboard( );
+                int nIndex = 1;
+
+                dashboard.setId( daoUtil.getInt( nIndex++ ) );
+                dashboard.setIdBean( daoUtil.getString( nIndex++ ) );
+                dashboard.setZone( daoUtil.getInt( nIndex++ ) );
+                dashboard.setPosition( daoUtil.getInt( nIndex ) );
+
+                dashboardList.add( dashboard );
+            }
+
+            return dashboardList;
+        }
+    }
+
 }

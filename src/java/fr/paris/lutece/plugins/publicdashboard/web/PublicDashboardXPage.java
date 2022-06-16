@@ -36,36 +36,36 @@ package fr.paris.lutece.plugins.publicdashboard.web;
 
 import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboard;
 import fr.paris.lutece.plugins.publicdashboard.business.PublicDashboardHome;
+import fr.paris.lutece.plugins.publicdashboard.service.PublicDashboardCacheService;
 import fr.paris.lutece.plugins.publicdashboard.service.PublicDashboardService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.dashboard.IPublicDashboardComponent;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class provides the user interface to manage Dashboard xpages ( manage, create, modify, remove )
  */
-@Controller( xpageName = "dashboard", pageTitleI18nKey = "publicdashboard.xpage.dashboard.pageTitle", pagePathI18nKey = "publicdashboard.xpage.dashboard.pagePathLabel" )
+@Controller( xpageName = "publicdashboard", pageTitleI18nKey = "publicdashboard.xpage.dashboard.pageTitle", pagePathI18nKey = "publicdashboard.xpage.dashboard.pagePathLabel" )
 public class PublicDashboardXPage extends MVCApplication
 {
     // Templates
     private static final String TEMPLATE_VIEW_DASHBOARDS = "/skin/plugins/publicdashboard/view_dashboards.html";
 
     // Markers
-    private static final String MARK_LIST_DASHBOARDS_CONTENT = "dashboard_list_content";
+    private static final String MARK_LIST_DASHBOARDS = "list_dashboard";
+    private static final String MARK_MAP_TEMPLATE = "map_template_dashboard";
 
     // Views
     private static final String VIEW_GET_DASHBOARDS = "getDashboards";
-
-    // Parameters
-    private static final String PARAMETER_ID_USER = "id_user";
 
     /**
      * return the form to manage dashboards
@@ -80,20 +80,29 @@ public class PublicDashboardXPage extends MVCApplication
 
         Map<String, Object> model = getModel( );
 
-        List<PublicDashboard> lstDashboard = PublicDashboardHome.getDashboardsListByPosition( );
-        List<String> listDashboardContent = new ArrayList<String>( lstDashboard.size( ) );
+        List<PublicDashboard> lstDashboard = PublicDashboardHome.getDashboardsList( );
+        Collections.sort( lstDashboard );
 
-        for ( PublicDashboard dash : lstDashboard )
+        Map<String, String> mapIncludeTemplateDashboard = new HashMap<>( );
+
+        Optional<XPage> xpage = PublicDashboardCacheService.getInstance( ).getResource( request.getParameter( PublicDashboardService.PARAMETER_ID ) );
+        if ( xpage.isPresent( ) )
         {
-            IPublicDashboardComponent dashboard = SpringContextService.getBean( dash.getIdBean( ) );
-            if ( dashboard != null )
-            {
-                listDashboardContent.add( dashboard.getDashboardData( PublicDashboardService.decryptGuid( request.getParameter( PARAMETER_ID_USER ) ), null ) );
-            }
+            return xpage.get( );
         }
+        else
+        {
+            PublicDashboardService.supplyModelAndTemplate( lstDashboard, model, mapIncludeTemplateDashboard, request );
 
-        model.put( MARK_LIST_DASHBOARDS_CONTENT, listDashboardContent );
+            model.put( MARK_LIST_DASHBOARDS, lstDashboard );
+            model.put( MARK_MAP_TEMPLATE, mapIncludeTemplateDashboard );
 
-        return getXPage( TEMPLATE_VIEW_DASHBOARDS, getLocale( request ), model );
+            XPage xpagedashboard = getXPage( TEMPLATE_VIEW_DASHBOARDS, getLocale( request ), model );
+
+            PublicDashboardCacheService.getInstance( )
+                    .putInCache( PublicDashboardCacheService.getCacheKey( request.getParameter( PublicDashboardService.PARAMETER_ID ) ), xpagedashboard );
+
+            return xpagedashboard;
+        }
     }
 }

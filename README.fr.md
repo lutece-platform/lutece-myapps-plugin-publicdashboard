@@ -3,11 +3,11 @@
 [![Line of code](https://dev.lutece.paris.fr/sonar/api/project_badges/measure?project=fr.paris.lutece.plugins%3Aplugin-publicdashboard&metric=ncloc)](https://dev.lutece.paris.fr/sonar/dashboard?id=fr.paris.lutece.plugins%3Aplugin-publicdashboard)
 [![Coverage](https://dev.lutece.paris.fr/sonar/api/project_badges/measure?project=fr.paris.lutece.plugins%3Aplugin-publicdashboard&metric=coverage)](https://dev.lutece.paris.fr/sonar/dashboard?id=fr.paris.lutece.plugins%3Aplugin-publicdashboard)
 
-# Plugin componentdashboard
+# Plugin publicdashboard
 
 ## Introduction
 
-Ce plugin est utilisé pour ajouter, enlever et consulter des publicdashboard
+Ce plugin est utilisé pour ajouter, enlever et consulter des publicdashboard. Un publicdahboard est un dashboard utilisateur qui peut être consulté publiquement par n'importe quel utilisateur.
 
 ## Configuration
 
@@ -15,7 +15,7 @@ En Back-Office, vous pouvez accéder via la page Gestion des dashboard pour ajou
 
 ## Usage
 
-En front office, vous pouvez accéder aux publicdashboards via l'url Portal.jsp?page=dashboard&view=getDashboards&id_user= Le paramètre id_user doit être chiffrer si la propriété publicdashboard.encrypt est à vrai
+En front office, vous pouvez accéder aux publicdashboards via l'url Portal.jsp?page=publicdashboard&view=getDashboards&id_user= Le paramètre id_user doit être chiffrer si la propriété publicdashboard.encrypt est à vraiPour chiffrer le id_user, il faut faire appel à méthode encryptRsa de la classe RsaService du lutece core.
 
 
 [Maven documentation and reports](https://dev.lutece.paris.fr/plugins/plugin-publicdashboard/)

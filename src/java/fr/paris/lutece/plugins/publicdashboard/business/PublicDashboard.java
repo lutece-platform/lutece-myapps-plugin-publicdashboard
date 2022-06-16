@@ -145,7 +145,15 @@ public class PublicDashboard implements Serializable, Comparable<PublicDashboard
     @Override
     public int compareTo( PublicDashboard o )
     {
-        return getPosition( ) - o.getPosition( );
+        if ( getZone( ) != o.getZone( ) )
+        {
+            return getZone( ) - o.getZone( );
+        }
+        else
+        {
+            return getPosition( ) - o.getPosition( );
+        }
+
     }
 
 }

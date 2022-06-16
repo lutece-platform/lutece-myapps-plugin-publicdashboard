@@ -13,9 +13,7 @@
 			<@formGroup labelFor='id_bean' labelKey='#i18n{publicdashboard.modify_dashboard.labelIdBean}' mandatory=true>
 				<@select name='id_bean' items=listtypedashboard id='id_bean' default_value='${dashboard.idBean!\'\'}' />
 			</@formGroup>
-			<@formGroup labelFor='zone' labelKey='#i18n{publicdashboard.modify_dashboard.labelZone}' mandatory=true>
-				<@input type='text' id='zone' name='zone'  value='${dashboard.zone!\'\'}' tabIndex='1' />
-			</@formGroup>
+			<@input type='hidden' id='zone' name='zone'  value='${dashboard.zone!\'\'}' tabIndex='1' />
         <@actionButtons button1Name="action_modifyDashboard" button2Name="view_manageDashboard"/>
     </@tform>
 	</@boxBody>

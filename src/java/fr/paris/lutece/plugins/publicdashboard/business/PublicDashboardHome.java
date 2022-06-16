@@ -39,19 +39,22 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * This class provides instances management methods (create, find, ...) for Dashboard objects
  */
 public final class PublicDashboardHome
 {
+	private static final String DASHBOARD_DAO_BEAN = "componentdashboard.dashboardDAO";
+	private static final String DASHBOARD_PLUGIN = "componentdashboard";
     // Static variable pointed at the DAO instance
-    private static IPublicDashboardDAO _dao = SpringContextService.getBean( "componentdashboard.dashboardDAO" );
-    private static Plugin _plugin = PluginService.getPlugin( "componentdashboard" );
+    private static IPublicDashboardDAO _dao = SpringContextService.getBean( DASHBOARD_DAO_BEAN );
+    private static Plugin _plugin = PluginService.getPlugin( DASHBOARD_PLUGIN );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -69,16 +72,6 @@ public final class PublicDashboardHome
      */
     public static PublicDashboard create( PublicDashboard dashboard )
     {
-        int nOrder = 1;
-        List<PublicDashboard> listDashboard = getDashboardsListByPosition( );
-
-        if ( !CollectionUtils.isEmpty( listDashboard ) )
-        {
-            nOrder = listDashboard.get( listDashboard.size( ) - 1 ).getPosition( ) + 1;
-        }
-
-        dashboard.setPosition( nOrder );
-
         _dao.insert( dashboard, _plugin );
 
         return dashboard;
@@ -181,6 +174,41 @@ public final class PublicDashboardHome
     public static List<PublicDashboard> getDashboardsListByPosition( )
     {
         return _dao.selectDashboardsListByPosition( _plugin );
+    }
+
+    /**
+     * Load the data of all the publicDashboard objects and returns them as a list
+     * 
+     * @return the list which contains the data of all the publicDashboard objects
+     */
+    public static List<PublicDashboard> getDashboardsListFromZone( int zone )
+    {
+        return _dao.selectDashboardsListByZone( _plugin, zone );
+    }
+
+    /**
+     * Load the data of all Dashboard and returns them as a map with the zone of the dashboard as key
+     * 
+     * @return all Dashboard and returns them as a map with the zone of the dashboard as key
+     */
+    public static Map<String, List<PublicDashboard>> getMapZoneDashboard( List<PublicDashboard> lstPublicDashboard )
+    {
+        Map<String, List<PublicDashboard>> mapZoneDashboard = new HashMap<>( );
+        for ( PublicDashboard dashboard : lstPublicDashboard )
+        {
+            if ( mapZoneDashboard.containsKey( String.valueOf( dashboard.getZone( ) ) ) )
+            {
+                mapZoneDashboard.get( String.valueOf( dashboard.getZone( ) ) ).add( dashboard );
+            }
+            else
+            {
+                List<PublicDashboard> lstPublicDashboardZone = new ArrayList<>( );
+                lstPublicDashboardZone.add( dashboard );
+                mapZoneDashboard.put( String.valueOf( dashboard.getZone( ) ), lstPublicDashboardZone );
+            }
+        }
+
+        return mapZoneDashboard;
     }
 
 }
