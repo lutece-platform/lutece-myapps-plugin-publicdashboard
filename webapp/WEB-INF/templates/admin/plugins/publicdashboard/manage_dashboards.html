@@ -1,64 +1,50 @@
-<#include "managedashboard_tabs.html" />
-<@tabs2 tab="dashboard" />
-
 <@box>
-	<@boxHeader title='#i18n{publicdashboard.manage_dashboard.title}' boxTools=true>
-	</@boxHeader>
-	<@boxBody>    
-    <@messages infos=infos />
-    <div class="clearfix"></div>
-    	<#assign zoneMax = 0 />
-    	<#list mapZoneDashboard?keys as key >
-    	<#assign zoneMax = key?number + 1 />
-    	<@box>
-    		<@boxHeader title='#i18n{publicdashboard.manage_dashboard.title}' boxTools=true>
-				#i18n{publicdashboard.manage_dashboards.title_zone} ${key}
+	<@boxHeader title='#i18n{publicdashboard.manage_dashboard.title}' boxTools=true />
+	<@boxBody>
+	<@messages infos=infos />
+		<#assign zoneMax = 0 />
+		<#list mapZoneDashboard?keys as key >
+		<#assign zoneMax = key?number + 1 />
+		<@box>
+			<@boxHeader title='#i18n{publicdashboard.manage_dashboards.title_zone} <strong>${key}</strong>' boxTools=true>
+				<@tform class='form-inline' name='manage_dashboard' action='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp'>
+					<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?view=createDashboard&zone=${key}' title='#i18n{publicdashboard.manage_dashboards.buttonAdd}' buttonIcon='plus' />
+				</@tform>
 			</@boxHeader>
-			<@boxBody>    
+			<@boxBody>
 			<@table>
-	    	<th>
-	        <@tform class='form-inline pull-right' name='manage_dashboard' action='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp'>
-				<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?view=createDashboard&zone=${key}' title='#i18n{publicdashboard.manage_dashboards.buttonAdd}' buttonIcon='plus' />
-			</@tform>
-	        </th>
-	        <tr>
-	            <th>#i18n{publicdashboard.manage_dashboards.columnIdBean}</th>
-	            <th>#i18n{portal.util.labelActions}</th>
-	        </tr>
-	        <@tableHeadBodySeparator />
-	        <#list mapZoneDashboard[key] as dashboard >
-	        <tr>
-	            <td>
-					${listtypedashboard[dashboard.idBean]} 
-				</td>
-	        	<td>
-					<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?view=modifyDashboard&id=${dashboard.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
-							
-					<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=confirmRemoveDashboard&id=${dashboard.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
-					
-					<#if dashboard_index!=0>
-	                   <a href="jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=moveUpDashboard&id=${dashboard.id}&zone=${key}"
-	                       class="btn btn-primary btn-sm" title="#i18n{dashboard.manage_dashboards.labelUp}" >
-	                         <i class="fa fa-arrow-up">&nbsp;</i>
-	                   </a>
-	                </#if>
-	                <#if dashboard_has_next>
-	                  <a href="jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=moveDownDashboard&id=${dashboard.id}&zone=${key}"
-	                       class="btn btn-primary btn-sm" title="#i18n{dashboard.manage_dashboards.labelDown}" >
-	                         <i class="fa fa-arrow-down">&nbsp;</i>
-	                   </a>
-	                </#if>
-					
-		        </td>
-	        </tr>
-	        </#list>
-	        </@table>
-	        </@boxBody>
-	    </@box>
-        </#list>
-    	<@tform class='form-inline pull-right' name='manage_dashboard' action='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp'>
+				<tr>
+					<th>#i18n{publicdashboard.manage_dashboards.columnIdBean}</th>
+					<th>#i18n{portal.util.labelActions}</th>
+				</tr>
+				<@tableHeadBodySeparator />
+				<#list mapZoneDashboard[key] as dashboard >
+				<tr>
+					<td>
+						${listtypedashboard[dashboard.idBean]} 
+					</td>
+					<td>
+						<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?view=modifyDashboard&id=${dashboard.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=confirmRemoveDashboard&id=${dashboard.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='danger'  />
+						<#if dashboard_index!=0>
+						<a href="jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=moveUpDashboard&id=${dashboard.id}&zone=${key}" class="btn btn-primary btn-sm" title="#i18n{dashboard.manage_dashboards.labelUp}" >
+							<i class="fa fa-arrow-up"></i>
+						</a>
+						</#if>
+						<#if dashboard_has_next>
+							<a href="jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?action=moveDownDashboard&id=${dashboard.id}&zone=${key}" class="btn btn-primary btn-sm" title="#i18n{dashboard.manage_dashboards.labelDown}" >
+								<i class="fa fa-arrow-down"></i>
+							</a>
+						</#if>
+					</td>
+				</tr>
+				</#list>
+				</@table>
+			</@boxBody>
+		</@box>
+		</#list>
+		<@tform class='form-inline pull-right' name='manage_dashboard' action='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp'>
 			<@aButton href='jsp/admin/plugins/publicdashboard/ManageDashboards.jsp?view=createDashboard&zone=${zoneMax}' title='#i18n{publicdashboard.manage_dashboards.zoneAdd}' buttonIcon='plus' />
 		</@tform>
-
   </@boxBody>
 </@box>
