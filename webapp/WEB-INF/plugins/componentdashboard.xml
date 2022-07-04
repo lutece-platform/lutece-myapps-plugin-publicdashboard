@@ -15,7 +15,7 @@
     <db-pool-required>1</db-pool-required>
     
     <core-version-dependency>
-        <min-core-version>7.0.6-SNAPSHOT</min-core-version>
+        <min-core-version><!-- TODO fix when the release is done 7.0.6 --></min-core-version>
         <max-core-version/>
     </core-version-dependency>
 
