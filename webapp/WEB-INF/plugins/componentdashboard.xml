@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<plug-in>
+<?xml version="1.0" encoding="UTF-8"?><plug-in>
     <name>publicdashboard</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>1.0.0-SNAPSHOT</version>
-    <documentation></documentation>
-    <installation></installation>
-    <changes></changes>
-    <user-guide></user-guide>
+    <version>1.0.0</version>
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
     <description>publicdashboard.plugin.description</description>
     <provider>publicdashboard.plugin.provider</provider>
     <provider-url>http://www.paris.fr</provider-url>
@@ -27,7 +26,7 @@
             <feature-description>publicdashboard.adminFeature.ManageDashboard.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/publicdashboard/ManageDashboards.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
+            <feature-icon-url/>
         </admin-feature>
     </admin-features>
 
